@@ -1,0 +1,30 @@
+{
+  "name": "synthetic-video",
+  "repository": "syntheticjs/synthetic-video",
+  "description": "Synthetic HTML5 video",
+  "version": "0.0.1",
+  "keywords": [],
+  "authors": [
+    {
+      "name": "Vladimir Kalmykov (aka Morulus)",
+      "email": "vladimirmorulus@gmail.com"
+    }
+  ],
+  "dependencies": {
+    "polyvitamins/polychrome": "master",
+    "polyvitamins/polychrome-dom": "master",
+    "polyvitamins/polychrome-objective": "master"
+  },
+  "license": "MIT",
+  "remotes": [
+    "github"
+  ],
+  "main": "dist/synthetic-video.js",
+  "scripts": [
+    "src/synthetic-video.js"
+  ],
+  "tags": [
+    "synthetic",
+    "video"
+  ]
+}

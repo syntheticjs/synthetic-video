@@ -12,8 +12,48 @@ define([
 	'polyvitamins~polychrome-dom@master/width',
 	'polyvitamins~polychrome-dom@master/height',
 	'polyvitamins~polychrome-dom@master/present',
-	'polyvitamins~polychrome-objective@master/tie'
+	'polyvitamins~polychrome-objective@master/tie',
+	'./synthetic-video.css'
 ], function($, codecs) {
+
+	function requestFullScreen(element) {
+	    // Supports most browsers and their versions.
+	    var requestMethod = element.requestFullScreen || element.webkitRequestFullScreen || element.mozRequestFullScreen || element.msRequestFullscreen;
+
+	    if (requestMethod) { // Native full screen.
+	        requestMethod.call(element);
+	    } else if (typeof window.ActiveXObject !== "undefined") { // Older IE.
+	        try {
+	        	var wscript = new ActiveXObject("WScript.Shell");
+	        } catch(e) {
+	        	return false;
+	        }
+	        if (wscript !== null) {
+	            wscript.SendKeys("{F11}");
+	        }
+	    }
+	}
+
+	function exitFullScreenMode() {
+		if (document.cancelFullScreen) {
+	      document.cancelFullScreen();
+	    } else if (document.mozCancelFullScreen) {
+	      document.mozCancelFullScreen();
+	    } else if (document.webkitCancelFullScreen) {
+	      document.webkitCancelFullScreen();
+	    }
+	    if (typeof window.ActiveXObject !== "undefined") {
+	    	try {
+	        	var wscript = new ActiveXObject("WScript.Shell");
+	        } catch(e) {
+	        	return false;
+	        }
+	    	wscript.SendKeys("{F11}");
+	    }
+	    if (document.msExitFullscreen) {
+	    	document.msExitFullscreen();
+	    }
+	}
 
 	Synthetic.createComponent('synthetic-video', function($component) {
 		$component
@@ -21,12 +61,12 @@ define([
 			
 		})
 		.created(function($self, $element, $scope) {
-			
+
 			/* Put video tag */
 			this.videoElement = $($element)
 			.empty()
 			.put('video', {
-				"classed": "synthetic-video__visible"
+				"classed": ""
 			})[0];
 
 			$($element)
@@ -43,7 +83,7 @@ define([
 			});
 			/* Control play */
 			this.videoControlPlay = this.videoControl.put('a', {
-				"class": "playbtn",
+				"class": "synthetic-video__playbtn synthetic-video__unvisible",
 				"href": ""
 			}).tie(function() {
 				$(this)
@@ -51,7 +91,8 @@ define([
 				.html('<svg><g><path fill="none" d="M29,16.491L0,32.982V0L29,16.491z"/></g></svg>')
 			})
 			.bind('click',function(e) {
-				if ($scope.playing) {
+
+				if (!$scope.playing) {
 					$self.play();
 				} else {
 					$self.stop();
@@ -63,27 +104,27 @@ define([
 			/* Fullscreen */
 			this.videoControlFullscreen = this.videoControl.put('a', {
 				"href": "",
-				"class": "synthetic-video__fullscreenbtn synthetic-video__visible"
+				"class": "synthetic-video__fullscreenbtn"
 			}).tie(function() {
 				$(this)
 				.put('span', {
-					"class": "disabled"
+					"class": "synthetic-video__disabled"
 				})
 				.html('Fullscreen ')
 				.and('span', {
-					"class": "enabled"
+					"class": "synthetic-video__enabled"
 				})
 				.html('Normal view ')
 				.and('img', {
 					"src": "http://www.estetica.ru/newest/esofas/images/manufactory/full_screen_arrow.png",
-					"class": "disabled"
+					"class": "synthetic-video__disabled"
 				})
 				.and('img', {
 					"src": "http://www.estetica.ru/newest/esofas/images/manufactory/to-normal-view.png",
-					"class": "enabled"
+					"class": "synthetic-video__enabled"
 				});
 			})
-			.bind('click', function() {
+			.bind('click', function(e) {
 				if ($scope.fullscreen) {
 					$self.normalView();
 				} else {
@@ -135,8 +176,7 @@ define([
 		Watch loaded
 		*/
 		$component.watch(['loaded'], function($self, $scope, loaded) {
-
-			$(this.videoElement).classed("synthetic-video__visible", !!loaded);
+			$(this.videoElement).classed("synthetic-video__unvisible", !loaded);
 			if (loaded) {
 				this.trimVideo();
 				if ($scope.attributes.autoplay) {
@@ -184,7 +224,11 @@ define([
 					"margin-top": vidTop+'px'
 				});
 			};
-		})
+		});
+
+		$component.watch(['fullscreen'], function($self, fullscreen) {
+			$($self.videoControlFullscreen).classed("synthetic-video__active", fullscreen);
+		});
 
 		return {
 			testVideo: function($scope) {
@@ -207,18 +251,20 @@ define([
 				vrWidth = this.videoElement.videoWidth,
 				wrapperWidth = $($element).width(),
 				wr = wrapperWidth/vrWidth;
+				console.log('TRIM', vrHeight, vrWidth, wr);
 				$(this.videoElement).css({
 					'width': wrapperWidth+'px',
 					'height': (vrHeight*wr)+'px'
 				});
 			},
 			play: function($scope, force) {
-				if (!force) {
+
+				if ($scope.mobileAPI && !force) {
 					this.fullscreen();
 				} else {
-					$(this.videoElement).classed("synthetic-video__visible", true);
-					$(this.videoControlPlay).classed("synthetic-video__visible", false);
-					$(this.videoControlFullscreen).classed("synthetic-video__visible", true);
+
+					$(this.videoElement).classed("synthetic-video__unvisible", false);
+					$(this.videoControlPlay).classed("synthetic-video__unvisible", true);
 					$scope.playing = true;
 					this.displayVideo(true);
 					this.trimVideo();
@@ -227,10 +273,9 @@ define([
 			},
 			stop: function($scope, pause) {
 				if (this.mobileAPI && !pause) {
-					$(this.videoElement).classed("synthetic-video__visible", false);
-				} else {
-					$(this.videoControlFullscreen).classed("synthetic-video__visible", false);
+					$(this.videoElement).classed("synthetic-video__unvisible", true);
 				}
+				$(this.videoControlPlay).classed("synthetic-video__unvisible", false);
 				this.videoElement.pause();
 				$scope.playing = false;
 				return this;
@@ -239,14 +284,15 @@ define([
 				if ($scope.playing) this.stop(true); // pause
 				else this.play();
 			},
-			fullscreen: function($element, $self) {
-				$($element).classed("fullscreenvideo", true);
-				this.play();
+			fullscreen: function($element, $self, $scope) {
+				$($element).classed("synthetic-video__require-fullscreen", true);
+				$scope.fullscreen=true;
+
+				this.play(true);
 				requestFullScreen(document.body);
 				// make window full screen
 				setTimeout(function() {
 					$("body").classed("synthetic-video__require-fullscreen", true);
-					$($self.videoControlFullscreen).classed("synthetic-video__active", true);
 					// $("#banner").proportionalBlock("disable"); // Disable proportional block
 					$scope.waitForEscapeFullscreen = true;
 					$self.trimVideo();
@@ -254,8 +300,9 @@ define([
 
 				return this;
 			},
-			normalView: function($element, cssOnly) {
-				$($element).classed("fullscreenvideo", false);
+			normalView: function($element, $scope, cssOnly) {
+				$($element).classed("synthetic-video__require-fullscreen", false);
+				$scope.fullscreen = false;
 				$scope.waitForEscapeFullscreen = false;
 				if (!cssOnly) {
 					exitFullScreenMode();
@@ -267,8 +314,6 @@ define([
 					//$(".overindex").show();
 
 					$("body").classed("synthetic-video__require-fullscreen", false);
-					
-					$($self.videoControlFullscreen).classed("synthetic-video__active", false);
 					//$("#banner").proportionalBlock("enable");
 					this.trimVideo();
 				}, 200);
@@ -281,13 +326,21 @@ define([
 				}
 			},
 			displayVideo: function($scope, ok, fullscreen) {
+
 				this.displayWrapper();
 				if (ok||false) {
-					if ($scope.loaded) $(this.videoElement).classed("synthetic-video__visible", true);
+
+					if ($scope.loaded) $(this.videoElement).classed("synthetic-video__unvisible", false);
 					//$scope.showOnLoad = true;
 					this.videoElement.play();
 					if (fullscreen) this.fullscreen();
 				};
+			},
+			displayWrapper: function($element) {
+				$($element).classed("synthetic-video__unvisible", false);
+				/*$($element).animate({
+					opacity:1
+				},1000);*/
 			}
 		}
 	});

@@ -1,0 +1,35 @@
+{
+  "name": "synthetic-video",
+  "version": "0.0.13",
+  "homepage": "https://github.com/syntheticjs/synthetic-video",
+  "authors": [
+    "Morulus <vladimirmorulus@gmail.com>"
+  ],
+  "description": "Synthetic HTML5 video",
+  "main": "dist/synthetic-video.js",
+  "authors": [
+  {
+    "name": "Vladimir Kalmykov (aka Morulus)",
+    "email": "vladimirmorulus@gmail.com"
+  }
+],
+  "moduleType": [
+    "globals"
+  ],
+  "keywords": [
+    "web-component"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "synthetic": "latest",
+    "synthetic-demo": "latest"
+  }
+}
