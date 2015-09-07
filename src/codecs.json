@@ -1,0 +1,5 @@
+{
+	"ogg": "video/ogg; codecs=\"theora, vorbis\"",
+	"webm": "video/webm",
+	"mp4": "video/mp4"
+}
