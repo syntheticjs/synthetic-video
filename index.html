@@ -3,12 +3,12 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Synthteic synthetic-video</title>
-	<script src="http://studio:88/components/vendor/dist/vendor.js" baseurl=""></script>
-	<script src="http://studio:88/components/vendor-component/index.js" baseurl=""></script>
-	<!--<script src="http://studio:88/components/synthet/dist/synthet.js"></script>-->
+	<script src="http://localhost:7777/components/vendor/dist/vendor.js" baseurl=""></script>
+	<script src="http://localhost:7777/components/vendor-component/index.js" baseurl=""></script>
+	<!--<script src="http://localhost:7777/components/synthet/dist/synthet.js"></script>-->
 	<script>
-	Vendor.addAlias('abstudio', 'http://studio:88/components/');
-	Vendor.addAlias('polyvitamins', 'http://studio:88/polyvitamins/');
+	Vendor.addAlias('abstudio', 'http://localhost:7777/components/');
+	Vendor.addAlias('polyvitamins', 'http://localhost:7777/polyvitamins/');
 	</script>
 
 	<!--<script src="test/vendor/synthetic/dist/synthetic.js"></script>
@@ -101,7 +101,7 @@
 				<p></p>
 			</summary>
 			<div class="demo">
-				<synthetic-video src="test/video/273763772.mp4" autoplay="true" types="webm,mp4" muted=""></synthetic-video>
+				<synthetic-video loop src="test/video/273763772.mp4" ratio="0.6" autoplay="true" types="webm,mp4" muted="" style="width:100%;"></synthetic-video>
 			</div>
 			<summary>
 				<h2>Usage:</h2>
@@ -115,8 +115,8 @@
 	</content>
 </body>
 <script>
-vendor(['http://studio:88/syntheticjs/synthetic/component.json'], function() {
-	vendor(['http://studio:88/syntheticjs/synthetic-video/component.json'], function() {
+vendor(['http://localhost:7777/syntheticjs/synthetic/component.json'], function() {
+	vendor(['http://localhost:7777/syntheticjs/synthetic-video/component.json'], function() {
 		
 	});
 });

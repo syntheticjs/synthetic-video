@@ -1,5 +1,7 @@
 synthetic-video {
 	display: inline-block;
+	background-color:#121212;
+	overflow:hidden;
 
 	&.synthetic-video__require-fullscreen {
 		z-index:2147483648;
@@ -16,10 +18,14 @@ synthetic-video {
 	>video {
 		max-width:100%;
 	}
+
+	img {
+		border:0;
+	}
 }
 
 .synthetic-video__unvisible {
-	display:none;
+	display:none !important;
 }
 
 .synthetic-video__controll {

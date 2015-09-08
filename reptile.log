@@ -1,2 +1,78 @@
 Ok, im reptilie
 VIRTUAL S:/mahabra/syntheticjs/synthetic-video/src/synthetic-video.js
+     S:/mahabra/polyvitamins/polychrome/component.json
+     SUBVIRTUAL S:/mahabra/polyvitamins/polychrome/src/init.js
+          S:/mahabra/polyvitamins/polychrome/src/suit.js
+               S:/mahabra/polyvitamins/polychrome/src/gist/common/extend.js
+               S:/mahabra/polyvitamins/polychrome/src/system/api/determineClass.js
+                    S:/mahabra/polyvitamins/polychrome/src/gist/strings/firstUpper.js
+               S:/mahabra/polyvitamins/polychrome/src/system/api/chargeClass.js
+                    S:/mahabra/polyvitamins/polychrome/src/system/api/isNativeClass.js
+                         S:/mahabra/polyvitamins/polychrome/src/system/var/nativeClasses.js
+                    S:/mahabra/polyvitamins/polychrome/src/gist/common/charge.js
+                         S:/mahabra/polyvitamins/polychrome/src/gist/common/mixin.js
+                    S:/mahabra/polyvitamins/polychrome/src/gist/common/inherit.js
+          S:/mahabra/polyvitamins/polychrome/src/internals/classes.js
+               S:/mahabra/polyvitamins/polychrome/src/system/var/classCreator.js
+     S:/mahabra/syntheticjs/synthetic-video/src/codecs.js
+     S:/mahabra/polyvitamins/polychrome-dom/component.json/put
+     SUBVIRTUAL S:/mahabra/polyvitamins/polychrome-dom/src/Dom/put.js
+          S:/mahabra/polyvitamins/polychrome-dom/src/Dom.js
+               S:/mahabra/polyvitamins/polychrome-dom/src/Dom/extras/querySelector.js
+               S:/mahabra/polyvitamins/polychrome/component.json/system/sings/sHTMLElement
+               SUBVIRTUAL S:/mahabra/polyvitamins/polychrome/src/system/sings/sHTMLElement.js
+               S:/mahabra/polyvitamins/polychrome/component.json/system/sings/sSelector
+               SUBVIRTUAL S:/mahabra/polyvitamins/polychrome/src/system/sings/sSelector.js
+                    S:/mahabra/polyvitamins/polychrome/src/gist/html/tags.js
+               S:/mahabra/polyvitamins/polychrome/component.json/system/sings/sQuery
+               SUBVIRTUAL S:/mahabra/polyvitamins/polychrome/src/system/sings/sQuery.js
+               S:/mahabra/polyvitamins/polychrome/component.json/system/sings/sWindow
+               SUBVIRTUAL S:/mahabra/polyvitamins/polychrome/src/system/sings/sWindow.js
+          S:/mahabra/polyvitamins/polychrome-dom/src/Dom/extras/determineNodeObject.js
+               S:/mahabra/polyvitamins/polychrome-dom/src/Dom/extras/createChild.js
+               S:/mahabra/polyvitamins/polychrome/component.json/gist/common/toArray.js
+               SUBVIRTUAL S:/mahabra/polyvitamins/polychrome/src/gist/common/toArray.js
+               S:/mahabra/polyvitamins/polychrome/component.json/system/api/determineClass
+               SUBVIRTUAL S:/mahabra/polyvitamins/polychrome/src/system/api/determineClass.js
+          S:/mahabra/polyvitamins/polychrome-eacher/component.json/each
+          SUBVIRTUAL S:/mahabra/polyvitamins/polychrome-eacher/src/Eacher/each.js
+               S:/mahabra/polyvitamins/polychrome-eacher/src/Eacher.js
+                    S:/mahabra/polyvitamins/polychrome/component.json/system/sings/sRichArray
+                    SUBVIRTUAL S:/mahabra/polyvitamins/polychrome/src/system/sings/sRichArray.js
+               S:/mahabra/polyvitamins/polychrome/component.json/gist/assay/isObjective
+               SUBVIRTUAL S:/mahabra/polyvitamins/polychrome/src/gist/assay/isObjective.js
+               S:/mahabra/polyvitamins/polychrome/component.json/gist/assay/isRichObjective
+               SUBVIRTUAL S:/mahabra/polyvitamins/polychrome/src/gist/assay/isRichObjective.js
+     S:/mahabra/polyvitamins/polychrome-dom/component.json/empty
+     SUBVIRTUAL S:/mahabra/polyvitamins/polychrome-dom/src/Dom/empty.js
+     S:/mahabra/polyvitamins/polychrome-dom/component.json/css
+     SUBVIRTUAL S:/mahabra/polyvitamins/polychrome-dom/src/Dom/css.js
+     S:/mahabra/polyvitamins/polychrome-dom/component.json/condition
+     SUBVIRTUAL S:/mahabra/polyvitamins/polychrome-dom/src/Dom/condition.js
+     S:/mahabra/polyvitamins/polychrome-dom/component.json/classed
+     SUBVIRTUAL S:/mahabra/polyvitamins/polychrome-dom/src/Dom/classed.js
+     S:/mahabra/polyvitamins/polychrome-dom/component.json/events
+     SUBVIRTUAL S:/mahabra/polyvitamins/polychrome-dom/src/Dom/events.js
+          S:/mahabra/polyvitamins/polychrome/component.json/gist/common/addEvent.js
+          SUBVIRTUAL S:/mahabra/polyvitamins/polychrome/src/gist/common/addEvent.js
+          S:/mahabra/polyvitamins/polychrome/component.json/gist/common/removeEvent.js
+          SUBVIRTUAL S:/mahabra/polyvitamins/polychrome/src/gist/common/removeEvent.js
+     S:/mahabra/polyvitamins/polychrome-dom/component.json/html
+     SUBVIRTUAL S:/mahabra/polyvitamins/polychrome-dom/src/Dom/html.js
+     S:/mahabra/polyvitamins/polychrome-dom/component.json/and
+     SUBVIRTUAL S:/mahabra/polyvitamins/polychrome-dom/src/Dom/and.js
+     S:/mahabra/polyvitamins/polychrome-dom/component.json/width
+     SUBVIRTUAL S:/mahabra/polyvitamins/polychrome-dom/src/Dom/width.js
+     S:/mahabra/polyvitamins/polychrome-dom/component.json/height
+     SUBVIRTUAL S:/mahabra/polyvitamins/polychrome-dom/src/Dom/height.js
+     S:/mahabra/polyvitamins/polychrome-dom/component.json/present
+     SUBVIRTUAL S:/mahabra/polyvitamins/polychrome-dom/src/Dom/present.js
+          S:/mahabra/polyvitamins/polychrome-dom/src/Dom/show.js
+               S:/mahabra/polyvitamins/polychrome-dom/src/Dom/css.js
+          S:/mahabra/polyvitamins/polychrome-dom/src/Dom/hide.js
+     S:/mahabra/polyvitamins/polychrome-objective/component.json/tie
+     SUBVIRTUAL S:/mahabra/polyvitamins/polychrome-objective/src/Objective/tie.js
+          S:/mahabra/polyvitamins/polychrome-objective/src/Objective.js
+               S:/mahabra/polyvitamins/polychrome/component.json/system/sings/sArray
+               SUBVIRTUAL S:/mahabra/polyvitamins/polychrome/src/system/sings/sArray.js
+     S:/mahabra/syntheticjs/synthetic-video/src/synthetic-video.css

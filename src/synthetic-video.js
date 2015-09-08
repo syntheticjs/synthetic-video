@@ -1,6 +1,6 @@
 define([
 	'polyvitamins~polychrome@master',
-	'./codecs.json',
+	'./codecs.js',
 	'polyvitamins~polychrome-dom@master/put',
 	'polyvitamins~polychrome-dom@master/empty',
 	'polyvitamins~polychrome-dom@master/css',
@@ -15,6 +15,31 @@ define([
 	'polyvitamins~polychrome-objective@master/tie',
 	'./synthetic-video.css'
 ], function($, codecs) {
+
+	// Remove event listner polyfill
+	var removeEventListner = function(el, type, handler) {
+		if ( el.addEventListener ) {
+		el.removeEventListener(type, handler, false);
+		}  else if ( elem.attachEvent ) {
+		el.detachEvent("on" + type, handler);
+		} else {
+		el["on"+type] = null;
+		};
+	},
+	// Event listner polyfill
+	eventListner = function(el, type, handler, once) {
+	    	var realhandler = once ? function() {
+		removeEventListner(el, type, realhandler);
+				} : handler;
+		if ( el.addEventListener ) {
+		listen = el.addEventListener( type, handler, false );
+		} else if (el.attachEvent) {
+		 listen = el.addEventListener( 'on'+type, handler, false );
+		} else {
+		el['on'+type] = handler;
+		}
+		return el;
+	};
 
 	function requestFullScreen(element) {
 	    // Supports most browsers and their versions.
@@ -61,7 +86,7 @@ define([
 			
 		})
 		.created(function($self, $element, $scope) {
-
+			$scope.loaded = false;
 			/* Put video tag */
 			this.videoElement = $($element)
 			.empty()
@@ -78,6 +103,7 @@ define([
 				"class": "synthetic-video__controll"
 			})
 			.bind('click', function() {
+				console.log('toggle');
 				// toggle play pause
 				$self.toggle();
 			});
@@ -139,6 +165,12 @@ define([
 		    document.addEventListener("webkitfullscreenchange", function() { $self.testExitFullscreen(); }, false);
 		    document.addEventListener("mozfullscreenchange", function() { $self.testExitFullscreen(); }, false);
 		    document.addEventListener("MSFullscreenChange", function () { $self.testExitFullscreen(); }, false);
+
+		    if ($scope.attributes.ratio) {
+		    	eventListner(window, 'resize', function() {
+		    		$self.trimVideo();
+		    	});
+		    }
 		});
 		
 		/*
@@ -230,6 +262,12 @@ define([
 			$($self.videoControlFullscreen).classed("synthetic-video__active", fullscreen);
 		});
 
+		$component.watch(['playing', 'loaded'], function(playing, loaded) {
+
+			$(this.videoControlPlay).classed("synthetic-video__unvisible", !(!playing&&!!loaded));
+			$(this.videoControlFullscreen).classed("synthetic-video__unvisible", !loaded);
+		});
+
 		return {
 			testVideo: function($scope) {
 				var that = this;
@@ -243,18 +281,28 @@ define([
 				};
 			},
 			trimVideo: function($element, $scope) {
-				if (!$scope.trimmed) return;
 				// Set video width/height
 				if (this.videoElement.videoHeight==0) return;
 
+				if ($scope.attributes.ratio && !$scope.fullscreen)
+				$($element).css("height", Math.round($($element).width()*parseFloat($scope.attributes.ratio))+'px');
+
+				if ($scope.fullscreen)
+				$($element).css("height", "100%");
+
 				var vrHeight = this.videoElement.videoHeight,
 				vrWidth = this.videoElement.videoWidth,
-				wrapperWidth = $($element).width(),
-				wr = wrapperWidth/vrWidth;
-				console.log('TRIM', vrHeight, vrWidth, wr);
+				wrapperWidth = !!$scope.fullscreen?$(window).width():$($element).width(),
+				wrapperHeight = ($scope.attributes.ratio&&!$scope.fullscreen)?Math.round(parseFloat($scope.attributes.ratio)*wrapperWidth):$($element).height(),
+				wr = wrapperWidth/vrWidth,
+				relHeight = vrHeight*wr;
+
+				console.log('wrapperHeight', wrapperHeight, 'relHeight', relHeight);
+				
 				$(this.videoElement).css({
 					'width': wrapperWidth+'px',
-					'height': (vrHeight*wr)+'px'
+					'height': relHeight+'px',
+					'marginTop': Math.round((wrapperHeight-relHeight)/2)+'px'
 				});
 			},
 			play: function($scope, force) {
@@ -264,7 +312,7 @@ define([
 				} else {
 
 					$(this.videoElement).classed("synthetic-video__unvisible", false);
-					$(this.videoControlPlay).classed("synthetic-video__unvisible", true);
+					
 					$scope.playing = true;
 					this.displayVideo(true);
 					this.trimVideo();
@@ -275,7 +323,7 @@ define([
 				if (this.mobileAPI && !pause) {
 					$(this.videoElement).classed("synthetic-video__unvisible", true);
 				}
-				$(this.videoControlPlay).classed("synthetic-video__unvisible", false);
+				
 				this.videoElement.pause();
 				$scope.playing = false;
 				return this;
@@ -286,6 +334,14 @@ define([
 			},
 			fullscreen: function($element, $self, $scope) {
 				$($element).classed("synthetic-video__require-fullscreen", true);
+				this.backupCss = {
+					width: $element.style.width,
+					height: $element.style.height
+				}
+				$($element).css({
+					"width": "100%",
+					"height": "100%"
+				});
 				$scope.fullscreen=true;
 
 				this.play(true);
@@ -296,12 +352,13 @@ define([
 					// $("#banner").proportionalBlock("disable"); // Disable proportional block
 					$scope.waitForEscapeFullscreen = true;
 					$self.trimVideo();
-				}, 200);
+				}, 350);
 
 				return this;
 			},
-			normalView: function($element, $scope, cssOnly) {
+			normalView: function($self, $element, $scope, cssOnly) {
 				$($element).classed("synthetic-video__require-fullscreen", false);
+				$($element).css(this.backupCss);
 				$scope.fullscreen = false;
 				$scope.waitForEscapeFullscreen = false;
 				if (!cssOnly) {
@@ -315,8 +372,8 @@ define([
 
 					$("body").classed("synthetic-video__require-fullscreen", false);
 					//$("#banner").proportionalBlock("enable");
-					this.trimVideo();
-				}, 200);
+					$self.trimVideo();
+				}, 350);
 
 				return this;
 			},
