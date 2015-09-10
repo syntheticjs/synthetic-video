@@ -8,6 +8,7 @@ define([
 	'polyvitamins~polychrome-dom@master/classed',
 	'polyvitamins~polychrome-dom@master/events',
 	'polyvitamins~polychrome-dom@master/html',
+	'polyvitamins~polychrome-dom@master/present',
 	'polyvitamins~polychrome-dom@master/and',
 	'polyvitamins~polychrome-dom@master/width',
 	'polyvitamins~polychrome-dom@master/height',
@@ -15,7 +16,7 @@ define([
 	'polyvitamins~polychrome-objective@master/tie',
 	'./synthetic-video.css'
 ], function($, codecs) {
-
+	var is_firefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
 	// Remove event listner polyfill
 	var removeEventListner = function(el, type, handler) {
 		if ( el.addEventListener ) {
@@ -80,34 +81,82 @@ define([
 	    }
 	}
 
+	var svgIcons = {
+		"synthetic-video-icon-fullscreen": '<g id="synthetic-video-icon-fullscreen"><path fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF" d="M0,0v3v5h3V3.005l5.984,0.01L9,0H3H0z M3,14.995V10H0v5v3h3h6l-0.016-3.016L3,14.995z M21,0h-6l0.016,3.016L21,3.005V8h3V3V0H21z M21,14.995l-5.984-0.011L15,18h6h3v-3v-5h-3V14.995z"/></g>',
+		"synthetic-video-icon-normalscreen": '<g id="synthetic-video-icon-normalscreen"><path fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF" d="M0,10l0.016,3.016L6,13.005V18h3v-5v-3H6H0z M24,8l-0.016-3.016L18,4.995V0h-3v5v3h3H24z M6,4.995l-5.984-0.01L0,8h6h3V5V0H6V4.995z M15,10v3v5h3v-4.995l5.984,0.011L24,10h-6H15z"/></g>',
+		"synthetic-video-icon-pause": '<g id="synthetic-video-icon-pause"><rect fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF" width="4" x="6" y="2" height="13.75"/><rect x="13.75" y="2" fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF" width="4" height="13.75"/></g>'
+	};
+
+	// Create function that create a link to svg arrow
+	function createSvgSprite(id) {
+		var svg = document.createElementNS("http://www.w3.org/2000/svg",'svg');
+		svg.style.width = "24px";
+		svg.style.height = "18px"
+		$(this).html('<svg width="24px" height="18px">'+svgIcons[id]+'</svg>');
+	};
+
+
+
 	Synthetic.createComponent('synthetic-video', function($component) {
 		$component
 		.attached(function($element) {
 			
 		})
-		.created(function($self, $element, $scope) {
+		.created(function($self, $element, $scope, $component) {
+			console.log('creating');
+			/*
+			Creates svg icons
+			*/
+			// Hell, this code is not supported in IE10-
+			/*if ("undefined"===typeof $component.__iconsMapCrated) {
+				var defssvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+				document.getElementsByTagName('body')[0].appendChild(defssvg);
+				defssvg.style.display = 'none';
+				defssvg.innerHTML = '<g id="synthetic-video-icon-fullscreen"><path fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF" d="M0,0v3v5h3V3.005l5.984,0.01L9,0H3H0z M3,14.995V10H0v5v3h3h6l-0.016-3.016L3,14.995z M21,0h-6l0.016,3.016L21,3.005V8h3V3V0H21z M21,14.995l-5.984-0.011L15,18h6h3v-3v-5h-3V14.995z"/></g>';
+				defssvg.innerHTML += '<g id="synthetic-video-icon-normalscreen"><path fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF" d="M0,10l0.016,3.016L6,13.005V18h3v-5v-3H6H0z M24,8l-0.016-3.016L18,4.995V0h-3v5v3h3H24z M6,4.995l-5.984-0.01L0,8h6h3V5V0H6V4.995z M15,10v3v5h3v-4.995l5.984,0.011L24,10h-6H15z"/></g>';
+				defssvg.innerHTML += '<g id="synthetic-video-icon-pause"><rect fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF" width="4" x="6" y="2" height="13.75"/><rect x="13.75" y="2" fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF" width="4" height="13.75"/></g>';
+				$component.__iconsMapCrated=true;
+			}*/
+
+
 			$scope.loaded = false;
 			/* Put video tag */
 			this.videoElement = $($element)
 			.empty()
 			.put('video', {
 				"classed": ""
+			})
+			.bind('dblclick', function() {
+				$self.toggleFullscreen();
+				e.stopPropagation();
+				return false;
+			})
+			.bind('click', function() {
+				// toggle play pause
+				$self.toggle();
 			})[0];
+
+			this.dummy = false;
 
 			$($element)
 			.css({
 				"position": "relative"
 			});
-
+			
 			this.videoControl = $($element).put('div', {
 				"class": "synthetic-video__controll"
 			})
 			.bind('click', function() {
-				console.log('toggle');
 				// toggle play pause
 				$self.toggle();
+			})
+			.bind('dblclick', function() {
+				$self.toggleFullscreen();
+				e.stopPropagation();
+				return false;
 			});
 			/* Control play */
+			;
 			this.videoControlPlay = this.videoControl.put('a', {
 				"class": "synthetic-video__playbtn synthetic-video__unvisible",
 				"href": ""
@@ -136,18 +185,14 @@ define([
 				.put('span', {
 					"class": "synthetic-video__disabled"
 				})
-				.html('Fullscreen ')
+				.tie(function() {
+					createSvgSprite.call(this, 'synthetic-video-icon-fullscreen');
+				})
 				.and('span', {
 					"class": "synthetic-video__enabled"
 				})
-				.html('Normal view ')
-				.and('img', {
-					"src": "http://www.estetica.ru/newest/esofas/images/manufactory/full_screen_arrow.png",
-					"class": "synthetic-video__disabled"
-				})
-				.and('img', {
-					"src": "http://www.estetica.ru/newest/esofas/images/manufactory/to-normal-view.png",
-					"class": "synthetic-video__enabled"
+				.tie(function() {
+					createSvgSprite.call(this, 'synthetic-video-icon-normalscreen');
 				});
 			})
 			.bind('click', function(e) {
@@ -156,6 +201,24 @@ define([
 				} else {
 					$self.fullscreen();
 				}
+				e.stopPropagation();
+				return false;
+			});
+
+			// Pause button
+			this.videoControlPausebtn = this.videoControl.put('a', {
+				"href": "",
+				"class": "synthetic-video__pausebtn"
+			}).tie(function() {
+				$(this)
+				.put('span', {
+				})
+				.tie(function() {
+					createSvgSprite.call(this, 'synthetic-video-icon-pause');
+				});
+			})
+			.bind('click', function(e) {
+				$self.toggle();
 				e.stopPropagation();
 				return false;
 			});
@@ -180,6 +243,13 @@ define([
 
 			this.videoControlPlay.present(Synthetic.hasPropertySubKey(controls, 'play'));
 			this.videoControlFullscreen.present(Synthetic.hasPropertySubKey(controls, 'fullscreen'));
+		});
+
+		/*
+		Video ratio
+		*/
+		$component.watch('attributes', ['ratio'], function($self, ratio) {
+			$self.trimVideo();
 		});
 
 		/*
@@ -263,15 +333,23 @@ define([
 		});
 
 		$component.watch(['playing', 'loaded'], function(playing, loaded) {
-
+			$(this.videoControlPausebtn).classed("synthetic-video__unvisible", (!playing&&!!loaded));
 			$(this.videoControlPlay).classed("synthetic-video__unvisible", !(!playing&&!!loaded));
 			$(this.videoControlFullscreen).classed("synthetic-video__unvisible", !loaded);
 		});
 
 		return {
 			testVideo: function($scope) {
-				var that = this;
-				if (this.videoElement.readyState<3) {
+				var that = this,
+				max = (is_firefox ? 2 : 3);
+				if (this.videoElement.readyState===0) {
+					console.log('wtf?');
+					this.trimVideo();
+				}
+				if (this.videoElement.readyState<max
+					
+				) {
+					
 					setTimeout(function() {
 						that.testVideo();
 					},300);
@@ -297,7 +375,7 @@ define([
 				wr = wrapperWidth/vrWidth,
 				relHeight = vrHeight*wr;
 
-				console.log('wrapperHeight', wrapperHeight, 'relHeight', relHeight);
+				console.log('sizing', vrHeight, vrWidth);
 				
 				$(this.videoElement).css({
 					'width': wrapperWidth+'px',
@@ -329,8 +407,16 @@ define([
 				return this;
 			},
 			toggle: function($scope) {
+
 				if ($scope.playing) this.stop(true); // pause
 				else this.play();
+			},
+			toggleFullscreen: function($scope) {
+				if ($scope.fullscreen)
+					this.normalView();
+				else
+					this.fullscreen();
+					;
 			},
 			fullscreen: function($element, $self, $scope) {
 				$($element).classed("synthetic-video__require-fullscreen", true);
@@ -343,6 +429,15 @@ define([
 					"height": "100%"
 				});
 				$scope.fullscreen=true;
+
+				/*
+				Заменяем этот элемент пустышкой
+				*/
+				this.dummy = $($element).and('div').css({"display": "none"})[0];
+				/*
+				А сам элемент перемещаем в body
+				*/
+				document.body.appendChild($element);
 
 				this.play(true);
 				requestFullScreen(document.body);
@@ -366,11 +461,26 @@ define([
 				}
 				if ($scope.attributes.stopOutFullscreen) this.stop();
 
+				/*
+				Move element back to his place
+				*/
+				if (this.dummy) {
+					$(this.dummy)
+					.and($element);
+					$(this.dummy)[0].parentNode.removeChild(this.dummy);
+					/*
+					После того как мы обратно закидываем элемент нужно ещё раз нажать на play
+					*/
+					this.videoElement.play();
+				}
+
+				$("body").classed("synthetic-video__require-fullscreen", false);
+
 				setTimeout(function() {
 					// Show overindex elements
 					//$(".overindex").show();
 
-					$("body").classed("synthetic-video__require-fullscreen", false);
+					
 					//$("#banner").proportionalBlock("enable");
 					$self.trimVideo();
 				}, 350);

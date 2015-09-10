@@ -626,11 +626,6 @@
             }
         });
     })(Eacher, isObjective, isRichObjective);
-    var toArray = function() {
-        return function(ob) {
-            return Array.prototype.slice.call(ob);
-        };
-    }();
     Dom.extend({
         css: function() {
             var data, polymorph = [];
@@ -650,6 +645,11 @@
             }
         }
     });
+    var toArray = function() {
+        return function(ob) {
+            return Array.prototype.slice.call(ob);
+        };
+    }();
     var createChild = function(core) {
         return function(nodeName, data, prepend) {
             var context = this === window ? document.body : this;
@@ -691,19 +691,47 @@
     var determineNodeObject = function($, createChild, toArray, determineAbstractClass) {
         return function(subject, data) {
             var objects = [], absClass = determineAbstractClass.call($, subject);
-            if (absClass.indexOf("HTMLELement") >= 0) {
+            if (absClass.indexOf("HTMLElement") >= 0) {
                 objects = [ subject ];
             } else if (absClass.indexOf("Selector") >= 0 || absClass.indexOf("String") >= 0) {
                 objects = createChild(subject, data || {});
             } else if (absClass.indexOf("Array") >= 0 || absClass.indexOf("RichArray") >= 0 || absClass.indexOf("Query") >= 0) {
                 objects = toArray(subject);
             } else {
-                console.dir(subject);
                 $.warn("Selector unknown format " + absClass[0]);
             }
             return objects;
         };
     }(init, createChild, toArray, determineClass2);
+    (function(core, Dom) {
+        Dom.extend({
+            show: function() {
+                this.each(function(elem) {
+                    if ("undefined" !== typeof elem.backupStyle && elem.backupStyle.display) {
+                        core(elem).css("display", elem.backupStyle.display);
+                    } else {
+                        core(elem).css("display", "");
+                    }
+                });
+                return this;
+            }
+        });
+    })(init, Dom);
+    (function(core, Dom) {
+        Dom.extend({
+            hide: function(selector) {
+                this.each(function(elem) {
+                    var currentDisplay = core(elem).css("display");
+                    if (currentDisplay !== "none") {
+                        if ("undefined" === typeof elem.backupStyle) elem.backupStyle = {};
+                        elem.backupStyle.display = currentDisplay;
+                    }
+                    core(elem).css("display", "none");
+                });
+                return this;
+            }
+        });
+    })(init, Dom);
     (function($) {
         $.registerSing("object", "Array", function(res) {
             if (res instanceof Array) return true;
@@ -750,30 +778,11 @@
             }
         };
     }();
-    (function(core, Dom) {
+    (function($, Dom) {
         Dom.extend({
-            show: function() {
+            present: function(flag) {
                 this.each(function(elem) {
-                    if ("undefined" !== typeof elem.backupStyle && elem.backupStyle.display) {
-                        core(elem).css("display", elem.backupStyle.display);
-                    } else {
-                        core(elem).css("display", "");
-                    }
-                });
-                return this;
-            }
-        });
-    })(init, Dom);
-    (function(core, Dom) {
-        Dom.extend({
-            hide: function(selector) {
-                this.each(function(elem) {
-                    var currentDisplay = core(elem).css("display");
-                    if (currentDisplay !== "none") {
-                        if ("undefined" === typeof elem.backupStyle) elem.backupStyle = {};
-                        elem.backupStyle.display = currentDisplay;
-                    }
-                    core(elem).css("display", "none");
+                    if (flag) $(elem).show(); else $(elem).hide();
                 });
                 return this;
             }
@@ -955,16 +964,6 @@
             }
         }
     });
-    (function($, Dom) {
-        Dom.extend({
-            present: function(flag) {
-                this.each(function(elem) {
-                    if (flag) $(elem).show(); else $(elem).hide();
-                });
-                return this;
-            }
-        });
-    })(init, Dom);
     Objective.extend({
         tie: function(fn) {
             fn.call(this);
@@ -972,6 +971,7 @@
         }
     });
     (function($, codecs) {
+        var is_firefox = navigator.userAgent.toLowerCase().indexOf("firefox") > -1;
         var removeEventListner = function(el, type, handler) {
             if (el.addEventListener) {
                 el.removeEventListener(type, handler, false);
@@ -1028,20 +1028,42 @@
                 document.msExitFullscreen();
             }
         }
+        var svgIcons = {
+            "synthetic-video-icon-fullscreen": '<g id="synthetic-video-icon-fullscreen"><path fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF" d="M0,0v3v5h3V3.005l5.984,0.01L9,0H3H0z M3,14.995V10H0v5v3h3h6l-0.016-3.016L3,14.995z M21,0h-6l0.016,3.016L21,3.005V8h3V3V0H21z M21,14.995l-5.984-0.011L15,18h6h3v-3v-5h-3V14.995z"/></g>',
+            "synthetic-video-icon-normalscreen": '<g id="synthetic-video-icon-normalscreen"><path fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF" d="M0,10l0.016,3.016L6,13.005V18h3v-5v-3H6H0z M24,8l-0.016-3.016L18,4.995V0h-3v5v3h3H24z M6,4.995l-5.984-0.01L0,8h6h3V5V0H6V4.995z M15,10v3v5h3v-4.995l5.984,0.011L24,10h-6H15z"/></g>',
+            "synthetic-video-icon-pause": '<g id="synthetic-video-icon-pause"><rect fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF" width="4" x="6" y="2" height="13.75"/><rect x="13.75" y="2" fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF" width="4" height="13.75"/></g>'
+        };
+        function createSvgSprite(id) {
+            var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+            svg.style.width = "24px";
+            svg.style.height = "18px";
+            $(this).html('<svg width="24px" height="18px">' + svgIcons[id] + "</svg>");
+        }
         Synthetic.createComponent("synthetic-video", function($component) {
-            $component.attached(function($element) {}).created(function($self, $element, $scope) {
+            $component.attached(function($element) {}).created(function($self, $element, $scope, $component) {
+                console.log("creating");
                 $scope.loaded = false;
                 this.videoElement = $($element).empty().put("video", {
                     classed: ""
+                }).bind("dblclick", function() {
+                    $self.toggleFullscreen();
+                    e.stopPropagation();
+                    return false;
+                }).bind("click", function() {
+                    $self.toggle();
                 })[0];
+                this.dummy = false;
                 $($element).css({
                     position: "relative"
                 });
                 this.videoControl = $($element).put("div", {
                     "class": "synthetic-video__controll"
                 }).bind("click", function() {
-                    console.log("toggle");
                     $self.toggle();
+                }).bind("dblclick", function() {
+                    $self.toggleFullscreen();
+                    e.stopPropagation();
+                    return false;
                 });
                 this.videoControlPlay = this.videoControl.put("a", {
                     "class": "synthetic-video__playbtn synthetic-video__unvisible",
@@ -1063,14 +1085,12 @@
                 }).tie(function() {
                     $(this).put("span", {
                         "class": "synthetic-video__disabled"
-                    }).html("Fullscreen ").and("span", {
+                    }).tie(function() {
+                        createSvgSprite.call(this, "synthetic-video-icon-fullscreen");
+                    }).and("span", {
                         "class": "synthetic-video__enabled"
-                    }).html("Normal view ").and("img", {
-                        src: "http://www.estetica.ru/newest/esofas/images/manufactory/full_screen_arrow.png",
-                        "class": "synthetic-video__disabled"
-                    }).and("img", {
-                        src: "http://www.estetica.ru/newest/esofas/images/manufactory/to-normal-view.png",
-                        "class": "synthetic-video__enabled"
+                    }).tie(function() {
+                        createSvgSprite.call(this, "synthetic-video-icon-normalscreen");
                     });
                 }).bind("click", function(e) {
                     if ($scope.fullscreen) {
@@ -1078,6 +1098,18 @@
                     } else {
                         $self.fullscreen();
                     }
+                    e.stopPropagation();
+                    return false;
+                });
+                this.videoControlPausebtn = this.videoControl.put("a", {
+                    href: "",
+                    "class": "synthetic-video__pausebtn"
+                }).tie(function() {
+                    $(this).put("span", {}).tie(function() {
+                        createSvgSprite.call(this, "synthetic-video-icon-pause");
+                    });
+                }).bind("click", function(e) {
+                    $self.toggle();
                     e.stopPropagation();
                     return false;
                 });
@@ -1102,6 +1134,9 @@
             $component.watch("attributes", [ "controls" ], function($scope, controls) {
                 this.videoControlPlay.present(Synthetic.hasPropertySubKey(controls, "play"));
                 this.videoControlFullscreen.present(Synthetic.hasPropertySubKey(controls, "fullscreen"));
+            });
+            $component.watch("attributes", [ "ratio" ], function($self, ratio) {
+                $self.trimVideo();
             });
             $component.watch("attributes", [ "types", "src" ], function($scope, types, src) {
                 $(this.videoElement).empty();
@@ -1164,13 +1199,18 @@
                 $($self.videoControlFullscreen).classed("synthetic-video__active", fullscreen);
             });
             $component.watch([ "playing", "loaded" ], function(playing, loaded) {
+                $(this.videoControlPausebtn).classed("synthetic-video__unvisible", !playing && !!loaded);
                 $(this.videoControlPlay).classed("synthetic-video__unvisible", !(!playing && !!loaded));
                 $(this.videoControlFullscreen).classed("synthetic-video__unvisible", !loaded);
             });
             return {
                 testVideo: function($scope) {
-                    var that = this;
-                    if (this.videoElement.readyState < 3) {
+                    var that = this, max = is_firefox ? 2 : 3;
+                    if (this.videoElement.readyState === 0) {
+                        console.log("wtf?");
+                        this.trimVideo();
+                    }
+                    if (this.videoElement.readyState < max) {
                         setTimeout(function() {
                             that.testVideo();
                         }, 300);
@@ -1183,7 +1223,7 @@
                     if ($scope.attributes.ratio && !$scope.fullscreen) $($element).css("height", Math.round($($element).width() * parseFloat($scope.attributes.ratio)) + "px");
                     if ($scope.fullscreen) $($element).css("height", "100%");
                     var vrHeight = this.videoElement.videoHeight, vrWidth = this.videoElement.videoWidth, wrapperWidth = !!$scope.fullscreen ? $(window).width() : $($element).width(), wrapperHeight = $scope.attributes.ratio && !$scope.fullscreen ? Math.round(parseFloat($scope.attributes.ratio) * wrapperWidth) : $($element).height(), wr = wrapperWidth / vrWidth, relHeight = vrHeight * wr;
-                    console.log("wrapperHeight", wrapperHeight, "relHeight", relHeight);
+                    console.log("sizing", vrHeight, vrWidth);
                     $(this.videoElement).css({
                         width: wrapperWidth + "px",
                         height: relHeight + "px",
@@ -1212,6 +1252,9 @@
                 toggle: function($scope) {
                     if ($scope.playing) this.stop(true); else this.play();
                 },
+                toggleFullscreen: function($scope) {
+                    if ($scope.fullscreen) this.normalView(); else this.fullscreen();
+                },
                 fullscreen: function($element, $self, $scope) {
                     $($element).classed("synthetic-video__require-fullscreen", true);
                     this.backupCss = {
@@ -1223,6 +1266,10 @@
                         height: "100%"
                     });
                     $scope.fullscreen = true;
+                    this.dummy = $($element).and("div").css({
+                        display: "none"
+                    })[0];
+                    document.body.appendChild($element);
                     this.play(true);
                     requestFullScreen(document.body);
                     setTimeout(function() {
@@ -1241,8 +1288,13 @@
                         exitFullScreenMode();
                     }
                     if ($scope.attributes.stopOutFullscreen) this.stop();
+                    if (this.dummy) {
+                        $(this.dummy).and($element);
+                        $(this.dummy)[0].parentNode.removeChild(this.dummy);
+                        this.videoElement.play();
+                    }
+                    $("body").classed("synthetic-video__require-fullscreen", false);
                     setTimeout(function() {
-                        $("body").classed("synthetic-video__require-fullscreen", false);
                         $self.trimVideo();
                     }, 350);
                     return this;

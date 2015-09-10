@@ -59,17 +59,17 @@ VIRTUAL S:/mahabra/syntheticjs/synthetic-video/src/synthetic-video.js
           SUBVIRTUAL S:/mahabra/polyvitamins/polychrome/src/gist/common/removeEvent.js
      S:/mahabra/polyvitamins/polychrome-dom/component.json/html
      SUBVIRTUAL S:/mahabra/polyvitamins/polychrome-dom/src/Dom/html.js
+     S:/mahabra/polyvitamins/polychrome-dom/component.json/present
+     SUBVIRTUAL S:/mahabra/polyvitamins/polychrome-dom/src/Dom/present.js
+          S:/mahabra/polyvitamins/polychrome-dom/src/Dom/show.js
+               S:/mahabra/polyvitamins/polychrome-dom/src/Dom/css.js
+          S:/mahabra/polyvitamins/polychrome-dom/src/Dom/hide.js
      S:/mahabra/polyvitamins/polychrome-dom/component.json/and
      SUBVIRTUAL S:/mahabra/polyvitamins/polychrome-dom/src/Dom/and.js
      S:/mahabra/polyvitamins/polychrome-dom/component.json/width
      SUBVIRTUAL S:/mahabra/polyvitamins/polychrome-dom/src/Dom/width.js
      S:/mahabra/polyvitamins/polychrome-dom/component.json/height
      SUBVIRTUAL S:/mahabra/polyvitamins/polychrome-dom/src/Dom/height.js
-     S:/mahabra/polyvitamins/polychrome-dom/component.json/present
-     SUBVIRTUAL S:/mahabra/polyvitamins/polychrome-dom/src/Dom/present.js
-          S:/mahabra/polyvitamins/polychrome-dom/src/Dom/show.js
-               S:/mahabra/polyvitamins/polychrome-dom/src/Dom/css.js
-          S:/mahabra/polyvitamins/polychrome-dom/src/Dom/hide.js
      S:/mahabra/polyvitamins/polychrome-objective/component.json/tie
      SUBVIRTUAL S:/mahabra/polyvitamins/polychrome-objective/src/Objective/tie.js
           S:/mahabra/polyvitamins/polychrome-objective/src/Objective.js
