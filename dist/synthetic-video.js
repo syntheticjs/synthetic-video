@@ -1131,6 +1131,9 @@
                     });
                 }
             });
+            $component.watch("attributes", [ "poster" ], function($scope, poster) {
+                if (poster) this.videoElement.setAttribute("poster", poster); else this.videoElement.removeAttribute("poster");
+            });
             $component.watch("attributes", [ "controls" ], function($scope, controls) {
                 this.videoControlPlay.present(Synthetic.hasPropertySubKey(controls, "play"));
                 this.videoControlFullscreen.present(Synthetic.hasPropertySubKey(controls, "fullscreen"));
@@ -1223,12 +1226,15 @@
                     if ($scope.attributes.ratio && !$scope.fullscreen) $($element).css("height", Math.round($($element).width() * parseFloat($scope.attributes.ratio)) + "px");
                     if ($scope.fullscreen) $($element).css("height", "100%");
                     var vrHeight = this.videoElement.videoHeight, vrWidth = this.videoElement.videoWidth, wrapperWidth = !!$scope.fullscreen ? $(window).width() : $($element).width(), wrapperHeight = $scope.attributes.ratio && !$scope.fullscreen ? Math.round(parseFloat($scope.attributes.ratio) * wrapperWidth) : $($element).height(), wr = wrapperWidth / vrWidth, relHeight = vrHeight * wr;
-                    console.log("sizing", vrHeight, vrWidth);
                     $(this.videoElement).css({
                         width: wrapperWidth + "px",
-                        height: relHeight + "px",
-                        marginTop: Math.round((wrapperHeight - relHeight) / 2) + "px"
+                        height: relHeight + "px"
                     });
+                    if ($scope.attributes.ratio) {
+                        $(this.videoElement).css({
+                            marginTop: Math.round((wrapperHeight - relHeight) / 2) + "px"
+                        });
+                    }
                 },
                 play: function($scope, force) {
                     if ($scope.mobileAPI && !force) {

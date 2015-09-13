@@ -237,6 +237,14 @@ define([
 		});
 		
 		/*
+		Watch propertie poster
+		*/
+		$component.watch('attributes', ['poster'], function($scope, poster) {
+			if (poster) this.videoElement.setAttribute("poster", poster);
+			else this.videoElement.removeAttribute("poster");
+		});
+
+		/*
 		Watch properties controls
 		*/
 		$component.watch('attributes', ['controls'], function($scope, controls) {
@@ -374,14 +382,16 @@ define([
 				wrapperHeight = ($scope.attributes.ratio&&!$scope.fullscreen)?Math.round(parseFloat($scope.attributes.ratio)*wrapperWidth):$($element).height(),
 				wr = wrapperWidth/vrWidth,
 				relHeight = vrHeight*wr;
-
-				console.log('sizing', vrHeight, vrWidth);
 				
 				$(this.videoElement).css({
 					'width': wrapperWidth+'px',
-					'height': relHeight+'px',
-					'marginTop': Math.round((wrapperHeight-relHeight)/2)+'px'
+					'height': relHeight+'px'
 				});
+				if ($scope.attributes.ratio) {
+					$(this.videoElement).css({
+						'marginTop': Math.round((wrapperHeight-relHeight)/2)+'px'
+					});
+				}
 			},
 			play: function($scope, force) {
 

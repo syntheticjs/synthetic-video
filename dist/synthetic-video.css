@@ -24,6 +24,7 @@ synthetic-video.synthetic-video__require-fullscreen a.synthetic-video__fullscree
 
 synthetic-video >video {
 	max-width:100%;
+	display:block;
 }
 
 synthetic-video img {
