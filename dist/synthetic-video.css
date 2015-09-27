@@ -1,6 +1,8 @@
 synthetic-video {
 	display: inline-block;
 	background-color:#121212;
+	background-size:cover;
+	background-position:top left;
 	overflow:hidden;
 }
 

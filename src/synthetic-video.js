@@ -236,10 +236,12 @@ define([
 		    }
 		});
 		
+		
 		/*
 		Watch propertie poster
 		*/
 		$component.watch('attributes', ['poster'], function($scope, poster) {
+			
 			if (poster) this.videoElement.setAttribute("poster", poster);
 			else this.videoElement.removeAttribute("poster");
 		});
@@ -266,7 +268,8 @@ define([
 		$component.watch('attributes', ['types','src'], function($scope, types, src) {
 
 			$(this.videoElement).empty();
-			types=types.split(','),
+			types="string"===typeof types ? types.split(',') : [],
+			src="string"===typeof src ? src : '',
 			psrc=src.lastIndexOf('.')>src.lastIndexOf('/') ? src.substring(0, src.lastIndexOf('.')) : src;
 			for (var i = 0;i<types.length;++i) {
 				$(this.videoElement).put('source', {
@@ -286,6 +289,7 @@ define([
 		Watch loaded
 		*/
 		$component.watch(['loaded'], function($self, $scope, loaded) {
+			
 			$(this.videoElement).classed("synthetic-video__unvisible", !loaded);
 			if (loaded) {
 				this.trimVideo();
@@ -340,10 +344,23 @@ define([
 			$($self.videoControlFullscreen).classed("synthetic-video__active", fullscreen);
 		});
 
-		$component.watch(['playing', 'loaded'], function(playing, loaded) {
-			$(this.videoControlPausebtn).classed("synthetic-video__unvisible", (!playing&&!!loaded));
-			$(this.videoControlPlay).classed("synthetic-video__unvisible", !(!playing&&!!loaded));
-			$(this.videoControlFullscreen).classed("synthetic-video__unvisible", !loaded);
+		$component.watch(['playing', 'loaded', 'attributes.poster', 'attributes.disabled'], function(playing, loaded, poster, disabled) {
+			
+			disabled=disabled!==null;
+
+			if (disabled) {
+				this.stop();
+			}
+
+			if (disabled || (poster&&!playing&&this.videoElement.currentTime===0)) {
+				this.$element.style.backgroundImage="url("+poster+")";
+			} else {
+				this.$element.style.backgroundImage='none';
+			}
+			$(this.videoElement)[0].style.visibility = (!disabled&&(playing||this.videoElement.currentTime)>0?'visible':'hidden');
+			$(this.videoControlPausebtn).classed("synthetic-video__unvisible", disabled||(!playing&&!!loaded));
+			$(this.videoControlPlay).classed("synthetic-video__unvisible", disabled||!(!playing&&!!loaded));
+			$(this.videoControlFullscreen).classed("synthetic-video__unvisible", disabled||!loaded);
 		});
 
 		return {
@@ -351,7 +368,6 @@ define([
 				var that = this,
 				max = (is_firefox ? 2 : 3);
 				if (this.videoElement.readyState===0) {
-					console.log('wtf?');
 					this.trimVideo();
 				}
 				if (this.videoElement.readyState<max
@@ -364,6 +380,7 @@ define([
 				} else {
 
 					$scope.loaded = true;
+					console.log('set loaded to true');
 				};
 			},
 			trimVideo: function($element, $scope) {
@@ -394,6 +411,8 @@ define([
 				}
 			},
 			play: function($scope, force) {
+
+				if ($scope.attributes.disabled) return false;
 
 				if ($scope.mobileAPI && !force) {
 					this.fullscreen();

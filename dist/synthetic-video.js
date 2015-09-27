@@ -1157,6 +1157,7 @@
                 this.testVideo();
             });
             $component.watch([ "loaded" ], function($self, $scope, loaded) {
+                console.log("loaded!", loaded);
                 $(this.videoElement).classed("synthetic-video__unvisible", !loaded);
                 if (loaded) {
                     this.trimVideo();
@@ -1201,7 +1202,13 @@
             $component.watch([ "fullscreen" ], function($self, fullscreen) {
                 $($self.videoControlFullscreen).classed("synthetic-video__active", fullscreen);
             });
-            $component.watch([ "playing", "loaded" ], function(playing, loaded) {
+            $component.watch([ "playing", "loaded", "attributes.poster" ], function(playing, loaded, poster) {
+                if (poster && !playing && this.videoElement.currentTime === 0) {
+                    this.$element.style.backgroundImage = "url(" + poster + ")";
+                } else {
+                    this.$element.style.backgroundImage = "none";
+                }
+                $(this.videoElement)[0].style.visibility = playing || this.videoElement.currentTime > 0 ? "visible" : "hidden";
                 $(this.videoControlPausebtn).classed("synthetic-video__unvisible", !playing && !!loaded);
                 $(this.videoControlPlay).classed("synthetic-video__unvisible", !(!playing && !!loaded));
                 $(this.videoControlFullscreen).classed("synthetic-video__unvisible", !loaded);
@@ -1210,7 +1217,6 @@
                 testVideo: function($scope) {
                     var that = this, max = is_firefox ? 2 : 3;
                     if (this.videoElement.readyState === 0) {
-                        console.log("wtf?");
                         this.trimVideo();
                     }
                     if (this.videoElement.readyState < max) {
@@ -1219,6 +1225,7 @@
                         }, 300);
                     } else {
                         $scope.loaded = true;
+                        console.log("set loaded to true");
                     }
                 },
                 trimVideo: function($element, $scope) {
